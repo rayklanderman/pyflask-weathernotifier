@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Notification App</title>
+  </head>
+  <body>
+    <h1>Weather Notification App</h1>
+    <form id="weatherForm">
+      <label for="location">Enter Location: </label>
+      <input type="text" id="location" name="location" required />
+      <button type="submit">Get Notification</button>
+    </form>
+
+    <div id="weatherResult"></div>
+
+    <script>
+      document
+        .getElementById("weatherForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault(); // Prevent form submission
+
+          const location = document.getElementById("location").value.trim(); // Trim any extra spaces
+          const resultDiv = document.getElementById("weatherResult");
+          resultDiv.innerHTML = ""; // Clear previous results
+
+          if (!location) {
+            resultDiv.innerHTML =
+              '<p style="color: red;">Please enter a location.</p>';
+            return;
+          }
+
+          try {
+            // Construct the URL with the entered location
+            const response = await fetch(
+              `/weather?location=${encodeURIComponent(location)}`
+            );
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // Display the weather data
+            resultDiv.innerHTML = `
+                    <p>Temperature: ${data.temperature.toFixed(2)}°C</p>
+                    <p>Pressure: ${data.atmospheric_pressure} hPa</p>
+                    <p>Humidity: ${data.humidity}%</p>
+                    <p>Weather: ${data.description}</p>
+                `;
+          } catch (error) {
+            resultDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+          }
+        });
+    </script>
+  </body>
+</html>
